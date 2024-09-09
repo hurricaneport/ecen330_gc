@@ -1,0 +1,14 @@
+{
+	"backtraceGraph" : 
+	{
+		"commands" : [],
+		"files" : [],
+		"nodes" : []
+	},
+	"installers" : [],
+	"paths" : 
+	{
+		"build" : "esp-idf/config",
+		"source" : "C:/Users/dansi/OneDrive - Brigham Young University/BYU/ECEN/330/Labs/ecen330_gc/components/config"
+	}
+}
