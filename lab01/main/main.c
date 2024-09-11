@@ -71,27 +71,27 @@ static const char *TAG = "lab01";
  */
 void drawCar(coord_t x, coord_t y) {
     //Body
-    lcd_drawRect2(x + BODY_X0, y + BODY_Y0, x + BODY_X1, y + BODY_Y1,CAR_CLR);
+    lcd_fillRect2(x + BODY_X0, y + BODY_Y0, x + BODY_X1, y + BODY_Y1,CAR_CLR);
 
     //Cab
-    lcd_drawRect2(x + CAB_X0, y + CAB_Y0, x + CAB_X1, y + CAB_Y1,CAR_CLR);
+    lcd_fillRect2(x + CAB_X0, y + CAB_Y0, x + CAB_X1, y + CAB_Y1,CAR_CLR);
 
     //Windows
-    lcd_drawRoundRect2(x + WINDOW_1_X0, y + WINDOW_1_Y0, x + WINDOW_1_X1, y + WINDOW_1_Y1,WINDOW_CORNER_RADIUS,
+    lcd_fillRoundRect2(x + WINDOW_1_X0, y + WINDOW_1_Y0, x + WINDOW_1_X1, y + WINDOW_1_Y1,WINDOW_CORNER_RADIUS,
                        WINDOW_CLR);
-    lcd_drawRoundRect2(x + WINDOW_2_X0, y + WINDOW_2_Y0, x + WINDOW_2_X1, y + WINDOW_2_Y1,WINDOW_CORNER_RADIUS,
+    lcd_fillRoundRect2(x + WINDOW_2_X0, y + WINDOW_2_Y0, x + WINDOW_2_X1, y + WINDOW_2_Y1,WINDOW_CORNER_RADIUS,
                        WINDOW_CLR);
 
     //Hood
-    lcd_drawTriangle(x + HOOD_X0, y + HOOD_Y0, x + HOOD_X1, y + HOOD_Y1, x + HOOD_X2, y + HOOD_Y2, CAR_CLR);
+    lcd_fillTriangle(x + HOOD_X0, y + HOOD_Y0, x + HOOD_X1, y + HOOD_Y1, x + HOOD_X2, y + HOOD_Y2, CAR_CLR);
 
     //Wheels
-    lcd_fillCircle(WHEEL_1_CENTER_X, WHEEL_1_CENTER_Y, WHEEL_OUTER_RADIUS, TIRE_CLR);
-    lcd_fillCircle(WHEEL_2_CENTER_X, WHEEL_2_CENTER_Y, WHEEL_OUTER_RADIUS, TIRE_CLR);
+    lcd_fillCircle(x + WHEEL_1_CENTER_X, y + WHEEL_1_CENTER_Y, WHEEL_OUTER_RADIUS, TIRE_CLR);
+    lcd_fillCircle(x + WHEEL_2_CENTER_X, y + WHEEL_2_CENTER_Y, WHEEL_OUTER_RADIUS, TIRE_CLR);
 
     //RIMS
-    lcd_fillCircle(WHEEL_1_CENTER_X, WHEEL_1_CENTER_Y, WHEEL_INNER_RADIUS, HUB_CLR);
-    lcd_fillCircle(WHEEL_2_CENTER_X, WHEEL_2_CENTER_Y, WHEEL_INNER_RADIUS, HUB_CLR);
+    lcd_fillCircle(x + WHEEL_1_CENTER_X, y + WHEEL_1_CENTER_Y, WHEEL_INNER_RADIUS, HUB_CLR);
+    lcd_fillCircle(x + WHEEL_2_CENTER_X, y + WHEEL_2_CENTER_Y, WHEEL_INNER_RADIUS, HUB_CLR);
 }
 
 //----------------------------------------------------------------------------//
@@ -148,10 +148,10 @@ void app_main(void) {
     lcd_fillScreen(BACKGROUND_CLR);
     lcd_drawString(0, 0, "Exercise 3", TITLE_CLR);
     for (coord_t x = -CAR_W; x <= LCD_W; x += OBJ_MOVE) {
-        lcd_drawRect(x - OBJ_MOVE, OBJ_Y, OBJ_MOVE, CAR_H, BACKGROUND_CLR);
+        lcd_fillRect(x - OBJ_MOVE, OBJ_Y, CAR_W, CAR_H, BACKGROUND_CLR);
         drawCar(x, OBJ_Y);
 
-        lcd_drawRect(0, LCD_H - FONT_H, FONT_W * 3, FONT_H, BACKGROUND_CLR);
+        lcd_fillRect(0, LCD_H - FONT_H, FONT_W * 3, FONT_H, BACKGROUND_CLR);
         char str[4];
         sprintf(str, "%3ld", x);
         lcd_drawString(0, LCD_H - FONT_H, str, STATUS_CLR);
@@ -175,15 +175,15 @@ void app_main(void) {
 
     // Draw an animated Pac-Man moving across the display.
     lcd_frameEnable();
-
     while (1) {
+        uint16_t i = 0;
+        const uint8_t pIdx[] = {0, 1, 2, 1};
         for (coord_t x = -PAC_W; x <= LCD_W; x += OBJ_MOVE) {
             lcd_fillScreen(BACKGROUND_CLR);
             lcd_drawString(0, 0, "Exercise 5", TITLE_CLR);
 
-            uint16_t i = 0;
-            const uint8_t pIdx[] = {0, 1, 2, 1};
             lcd_drawBitmap(x, OBJ_Y, pac[pIdx[i++ % sizeof(pIdx)]], PAC_W, PAC_H, YELLOW);
+
 
             char str[4];
             sprintf(str, "%3ld", x);
