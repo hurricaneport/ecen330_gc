@@ -132,44 +132,52 @@ void app_main(void)
 	drawCar(OBJ_X, OBJ_Y);
 	delayMS(WAIT);
 
-	// TODO: Exercise 2 - Draw moving car (Method 1), one pass across display.
+	// Exercise 2 - Draw moving car (Method 1), one pass across display.
 	lcd_fillScreen(BACKGROUND_CLR);
-	// Use a loop and increment x by OBJ_MOVE each iteration.
-	// Start x off-screen (negative coordinate).
-	// Move loop:
-	// * Fill screen with background color
-	// * Draw string "Exercise 2" at top left of screen with title color
-	// * Draw car at x, OBJ_Y
-	// * Display the x position of the car at bottom left of screen
-	//   with status color
+	for(coord_t x = -CAR_W; x<= LCD_W; x += OBJ_MOVE) {
+		lcd_fillScreen(BACKGROUND_CLR);
+		lcd_drawString(0,0,"Exercise 2", TITLE_CLR);
+		drawCar(x, OBJ_Y);
 
-	// TODO: Exercise 3 - Draw moving car (Method 2), one pass across display.
-	// Move by erasing car at old position, then redrawing at new position.
-	// Objects that don't change or move are drawn once.
-	// Before loop:
-	// * Fill screen once with background color
-	// * Draw string "Exercise 3" at top left of screen with title color
-	// Move loop:
-	// * Erase car at old position by drawing a rectangle with background color
-	// * Draw car at new position
-	// * Erase status at bottom by drawing a rectangle with background color
-	// * Display new position status of car at bottom left of screen
-	// After running the above first, add a 20ms delay within the loop
-	// at the end to see the effect.
+		uint8_t str[4];
+		sprintf(str, "%3ld", x);
+		lcd_drawString(0,LCD_H - FONT_H,str, STATUS_CLR);
+	}
 
-	// TODO: Exercise 4 - Draw moving car (Method 3), one pass across display.
-	// First, draw all objects into a cleared, off-screen frame buffer.
-	// Then, transfer the entire frame buffer to the screen.
-	// Before loop:
-	// * Enable the frame buffer
-	// Move loop:
-	// * Fill screen (frame buffer) with background color
-	// * Draw string "Exercise 4" at top left with title color
-	// * Draw car at x, OBJ_Y
-	// * Display position of the car at bottom left with status color
-	// * Write the frame buffer to the LCD
+	// Exercise 3 - Draw moving car (Method 2), one pass across display.
+	lcd_fillScreen(BACKGROUND_CLR);
+	lcd_drawString(0,0,"Exercise 3", TITLE_CLR);
+	for (coord_t x = -CAR_W; x<= LCD_W; x += OBJ_MOVE) {
+		lcd_drawRect(x - OBJ_MOVE, OBJ_Y, OBJ_MOVE, CAR_H, BACKGROUND_CLR);
+		drawCar(x, OBJ_Y);
+
+		lcd_drawRect(0,LCD_H - FONT_H, FONT_W * 3, FONT_H, BACKGROUND_CLR);
+		uint8_t str[4];
+		sprintf(str, "%3ld", x);
+		lcd_drawString(0,LCD_H - FONT_H, str, STATUS_CLR);
+		delayMS(DELAY_EX3);
+	}
+
+	// Exercise 4 - Draw moving car (Method 3), one pass across display.
+	lcd_frameEnable();
+
+	for (coord_t x = -CAR_W; x<= LCD_W; x += OBJ_MOVE) {
+		lcd_fillScreen(BACKGROUND_CLR);
+		lcd_drawString(0,0,"Exercise 4", TITLE_CLR);
+		drawCar(x, OBJ_Y);
+
+		uint8_t str[4];
+		sprintf(str, "%3ld", x);
+		lcd_drawString(0, LCD_H - FONT_H, str, STATUS_CLR);
+		lcd_writeFrame();
+	}
 
 	// TODO: Exercise 5 - Draw an animated Pac-Man moving across the display.
+	lcd_frameEnable();
+
+	while(1) {
+
+	}
 	// Use Pac-Man sprites instead of the car object.
 	// Cycle through each sprite when moving the Pac-Man character.
 	// Before loop:
