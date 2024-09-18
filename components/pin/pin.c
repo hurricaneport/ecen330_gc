@@ -133,10 +133,10 @@ int32_t pin_pulldown(pin_num_t pin, bool enable) {
 
 // Enable or disable the pin as an input signal.
 int32_t pin_input(pin_num_t pin, bool enable) {
-    if (enable) {
+    if (enable) { //set
         REG_SET_BIT(IO_MUX_REG(pin), FUN_IE);
     }
-    else {
+    else { //clear
         REG_CLR_BIT(IO_MUX_REG(pin), FUN_IE);
     }
     return 0;
@@ -144,10 +144,10 @@ int32_t pin_input(pin_num_t pin, bool enable) {
 
 // Enable or disable the pin as an output signal.
 int32_t pin_output(pin_num_t pin, bool enable) {
-    if (pin < REG_BITS) {
+    if (pin < REG_BITS) { //reg out1
         if (enable) REG_SET_BIT(GPIO_ENABLE_REG, pin);
         else REG_CLR_BIT(GPIO_ENABLE_REG, pin);
-    } else {
+    } else { //reg out2
         if (enable) REG_SET_BIT(GPIO_ENABLE1_REG, pin - REG_BITS);
         else REG_CLR_BIT(GPIO_ENABLE1_REG, pin - REG_BITS);
     }
@@ -163,10 +163,12 @@ int32_t pin_odrain(pin_num_t pin, bool enable) {
 
 // Sets the output signal level if the pin is configured as an output.
 int32_t pin_set_level(pin_num_t pin, int32_t level) {
+
+    //reg out1
     if (pin < REG_BITS) {
         if (level) REG_SET_BIT(GPIO_OUT_REG, pin);
         else REG_CLR_BIT(GPIO_OUT_REG, pin);
-    } else {
+    } else { //reg out2
         if (level) REG_SET_BIT(GPIO_OUT1_REG, pin - REG_BITS);
         else REG_CLR_BIT(GPIO_OUT1_REG, pin - REG_BITS);
     }
@@ -187,7 +189,7 @@ int32_t pin_get_level(pin_num_t pin) {
 // The two 32-bit input registers are concatenated into a uint64_t.
 uint64_t pin_get_in_reg(void) {
     uint64_t in_values = REG(GPIO_IN1_REG);
-    in_values = in_values << 32;
+    in_values = in_values << REG_BITS;
     in_values += REG(GPIO_IN_REG);
 
     return in_values;
@@ -197,7 +199,7 @@ uint64_t pin_get_in_reg(void) {
 // The two 32-bit output registers are concatenated into a uint64_t.
 uint64_t pin_get_out_reg(void) {
     uint64_t in_values = REG(GPIO_OUT1_REG);
-    in_values = in_values << 32;
+    in_values = in_values << REG_BITS;
     in_values += REG(GPIO_OUT_REG);
 
     return in_values;
