@@ -46,15 +46,8 @@ void app_main(void)
     gptimer_new_timer(&config, &gptimer);
 
     gptimer_event_callbacks_t cbs = {
-    .on_alarm = on_timer_alarm};
-
-    gptimer_register_event_callbacks(gptimer, &cbs, NULL);
-
-
-
-    gptimer_event_callbacks_t cbs = {
-        .on_alarm = NULL
+        .on_alarm = on_timer_alarm
     };
 
-
+    gptimer_register_event_callbacks(gptimer, &cbs, NULL);
 }
