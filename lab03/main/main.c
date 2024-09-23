@@ -15,6 +15,9 @@
 #define TIMER_RESOLUTION 1000000
 #define ALARM_PERIOD .01
 
+#define CNT_PERIOD 5
+#define AlARM_FREQUENCY 100
+
 static const char *TAG = "lab03";
 volatile uint32_t g_timer_ticks;
 volatile bool g_running;
@@ -107,9 +110,11 @@ void app_main(void)
     watch_init(); // Initialize stopwatch face
     while(true) { // forever update loop
         watch_update(g_timer_ticks);
-        if (g_isr_cnt == 500) {
-            g_isr_cnt = 0;
+        if (g_isr_cnt >= CNT_PERIOD * AlARM_FREQUENCY) {
+
             printf("Time elapsed - ISR Execute Time %llu\n", g_isr_max);
+            g_isr_cnt = 0;
+            g_isr_max = 0;
         }
     }
 }
