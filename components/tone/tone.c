@@ -41,7 +41,7 @@ void tone_start(tone_t tone, uint32_t freq) {
     for (int x = 0; x < period_samples; x++) {
         switch(tone) {
             case SINE_T:
-                g_buffer[x] = sinf((float) 2*M_PI*freq*((float) x/g_sample_hz));
+                g_buffer[x] = (float) x / (float) g_sample_hz;
                 printf("x:%d buffer;%d\n", x, g_buffer[x]);
                 break;
             case SQUARE_T:
