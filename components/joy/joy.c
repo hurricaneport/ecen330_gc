@@ -82,8 +82,10 @@ int32_t joy_deinit(void) {
 // *dcx: pointer to displacement in x.
 // *dcy: pointer to displacement in y.
 void joy_get_displacement(int32_t *dcx, int32_t *dcy) {
-    adc_oneshot_read(*g_adc_handle, ADC_CHANNEL_X, (int*) dcx);
-    adc_oneshot_read(*g_adc_handle, ADC_CHANNEL_Y, (int*) dcy);
-    *dcx -= g_offset_x;
-    *dcy -= g_offset_y;
+    int_fast32_t dcx_read;
+    int_fast32_t dcy_read;
+    adc_oneshot_read(*g_adc_handle, ADC_CHANNEL_X, &dcx_read);
+    adc_oneshot_read(*g_adc_handle, ADC_CHANNEL_Y, &dcy_read);
+    *dcx = dcx_read - g_offset_x;
+    *dcy = dcy_read - g_offset_y;
 }
