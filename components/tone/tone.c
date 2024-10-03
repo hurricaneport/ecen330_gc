@@ -4,9 +4,14 @@
 #include <math.h>
 #include <stdio.h>
 
+#define DAC_RANGE 256
+#define WAVE_AMPLITUDE DAC_RANGE / 2
+#define BIAS DAC_RANGE / 2
 
 uint8_t * g_buffer;
 uint32_t g_sample_hz;
+
+
 
 // Initialize the tone driver. Must be called before using.
 // May be called again to change sample rate.
@@ -20,6 +25,7 @@ int32_t tone_init(uint32_t sample_hz) {
     g_sample_hz = sample_hz;
 
     return 0;
+
 
 }
 
@@ -41,7 +47,7 @@ void tone_start(tone_t tone, uint32_t freq) {
     for (int x = 0; x < period_samples; x++) {
         switch(tone) {
             case SINE_T:
-                g_buffer[x] = (float) x / (float) g_sample_hz;
+                g_buffer[x] = WAVE_AMPLITUDE * sinf(2 * M_PI * (float) freq * (float) x / (float) period_samples) + BIAS;
                 printf("x:%d buffer;%d\n", x, g_buffer[x]);
                 break;
             case SQUARE_T:
@@ -54,4 +60,6 @@ void tone_start(tone_t tone, uint32_t freq) {
                 break;
         }
     }
+
+    sound_cyclic(g_buffer, period_samples);
 }
