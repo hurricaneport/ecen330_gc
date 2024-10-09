@@ -63,8 +63,7 @@ void tone_start(tone_t tone, uint32_t freq) {
                 else g_buffer[x] = BIAS + (DAC_RANGE / (period_samples / HALF_PERIOD)) * (x - period_samples); // Last Quarter - Shifter
                 break;
             case SAW_T:
-                if (x < period_samples / HALF_PERIOD) g_buffer[x] = BIAS + (DAC_RANGE / period_samples) * x; // First Half
-                else g_buffer[x] = BIAS + (DAC_RANGE / period_samples) * (x - period_samples); // Second Half - Shifted
+                g_buffer[x] = BIAS + ((float) DAC_RANGE / (float) period_samples) * x; // First Half
                 break;
             case LAST_T:
                 break;
