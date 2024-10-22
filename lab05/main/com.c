@@ -57,10 +57,14 @@ int32_t com_deinit(void) {
 // *buf: pointer to data buffer
 // size: size of data in bytes to write
 // Return number of bytes written, or negative number if error.
-int32_t com_write(const void *buf, uint32_t size);
+int32_t com_write(const void *buf, uint32_t size) {
+    return uart_tx_chars(UART_NUM, buf, size);
+}
 
 // Read data from the communication channel. Does not wait for data.
 // *buf: pointer to data buffer
 // size: size of data in bytes to read
 // Return number of bytes read, or negative number if error.
-int32_t com_read(void *buf, uint32_t size);
+int32_t com_read(void *buf, uint32_t size) {
+    return uart_read_bytes(UART_NUM, buf, size, 0);
+}
