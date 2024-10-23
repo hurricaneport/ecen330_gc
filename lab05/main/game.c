@@ -41,6 +41,8 @@ game_state_t current_state_g;
 uint8_t tx_buffer;
 uint8_t rx_buffer;
 
+bool bytes_received;
+
 void start_game(void) {
     lcd_fillRect(0, 0, LCD_W, LCD_H, BACKGROUND_COLOR);
     board_clear();
@@ -55,15 +57,24 @@ void start_game(void) {
 }
 
 void wait_mark(void) {
-    com_read(&rx_buffer, 1);
+    if (com_read(&rx_buffer, 1)) {
+	printf("Receiving with buffer %d\n", rx_buffer);
+        bytes_received = 1;
+    }
 }
 
 void mark(void) {
+    
+    bool pos_rx = 0;
+
     int8_t curr_r, curr_c;
-    if (rx_buffer) {
+    if (bytes_received) {
         curr_r = rx_buffer >> POS_BITS;
         curr_c = rx_buffer & C_MASK;
         rx_buffer = 0;
+	pos_rx = 1;
+	bytes_received = 0;
+
     } else {
         nav_get_loc(&curr_r, &curr_c);
     }
@@ -77,8 +88,11 @@ void mark(void) {
             graphics_drawO(curr_r, curr_c, O_COLOR);
             current_turn_g = X_m;
         }
-        tx_buffer = curr_r << POS_BITS | (curr_c & C_MASK);
-        com_write(&tx_buffer, 1);
+	if (!pos_rx) {
+            tx_buffer = curr_r << POS_BITS | (curr_c & C_MASK);
+            com_write(&tx_buffer, 1);
+	    printf("transmitting with buffer %d\n", tx_buffer);
+	}
     }
 }
 
@@ -109,7 +123,7 @@ void game_init(void) {
     current_turn_g = X_m;
     game_winner_g = no_m;
     board_clear();
-    com_init();
+    
 }
 
 // Update the game logic.
@@ -128,7 +142,7 @@ void game_tick(void) {
             graphics_drawMessage(turn_message, MESSAGE_COLOR, MESSAGE_BG_COLOR);
             break;
         case WAIT_MARK_ST:
-            if (!pin_get_level(HW_BTN_A) || rx_buffer) {
+            if (!pin_get_level(HW_BTN_A) || bytes_received) {
                 current_state_g = MARK_ST;
             } else {
                 current_state_g = WAIT_MARK_ST;

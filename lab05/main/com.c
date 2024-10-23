@@ -38,6 +38,7 @@ int32_t com_init(void) {
     }
 
     if (uart_driver_install(UART_NUM, RX_BUFFER_SIZE, 0, 0, NULL, 0) != ESP_OK) { return -1; }
+    printf("intalling driver");
 
     pin_pullup(RX_PIN, true);
 
