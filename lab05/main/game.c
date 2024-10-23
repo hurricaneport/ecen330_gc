@@ -1,5 +1,6 @@
 #include "game.h"
 
+#include <com.h>
 #include <config.h>
 
 #include "pin.h"
@@ -19,6 +20,9 @@
 #define GRID_COLOR WHITE
 #define BACKGROUND_COLOR BLACK
 
+#define POS_BITS 4
+#define C_MASK 0b00001111
+
 
 typedef enum {
     INIT_ST,
@@ -34,6 +38,9 @@ mark_t game_winner_g;
 
 game_state_t current_state_g;
 
+uint8_t tx_buffer;
+uint8_t rx_buffer;
+
 void start_game(void) {
     lcd_fillRect(0, 0, LCD_W, LCD_H, BACKGROUND_COLOR);
     board_clear();
@@ -42,11 +49,24 @@ void start_game(void) {
 
     game_winner_g = no_m;
     current_turn_g = X_m;
+
+    while (com_read(&rx_buffer, 1)) {}
+    rx_buffer = 0;
+}
+
+void wait_mark(void) {
+    com_read(&rx_buffer, 1);
 }
 
 void mark(void) {
     int8_t curr_r, curr_c;
-    nav_get_loc(&curr_r, &curr_c);
+    if (rx_buffer) {
+        curr_r = rx_buffer >> POS_BITS;
+        curr_c = rx_buffer & C_MASK;
+        rx_buffer = 0;
+    } else {
+        nav_get_loc(&curr_r, &curr_c);
+    }
     if (!board_set(curr_r,curr_c, current_turn_g)) {
         graphics_drawMessage("Space already Occupied", MESSAGE_COLOR, MESSAGE_BG_COLOR);
     } else {
@@ -57,6 +77,8 @@ void mark(void) {
             graphics_drawO(curr_r, curr_c, O_COLOR);
             current_turn_g = X_m;
         }
+        tx_buffer = curr_r << POS_BITS | (curr_c & C_MASK);
+        com_write(&tx_buffer, 1);
     }
 }
 
@@ -87,6 +109,7 @@ void game_init(void) {
     current_turn_g = X_m;
     game_winner_g = no_m;
     board_clear();
+    com_init();
 }
 
 // Update the game logic.
@@ -105,7 +128,7 @@ void game_tick(void) {
             graphics_drawMessage(turn_message, MESSAGE_COLOR, MESSAGE_BG_COLOR);
             break;
         case WAIT_MARK_ST:
-            if (!pin_get_level(HW_BTN_A)) {
+            if (!pin_get_level(HW_BTN_A) || rx_buffer) {
                 current_state_g = MARK_ST;
             } else {
                 current_state_g = WAIT_MARK_ST;
@@ -133,6 +156,7 @@ void game_tick(void) {
             start_game();
             break;
         case WAIT_MARK_ST:
+            wait_mark();
             break;
         case MARK_ST:
             mark();
