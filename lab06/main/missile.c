@@ -1,17 +1,23 @@
 #include <stdbool.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "lcd.h"
 #include "missile.h"
 
+#define EXPONENT_SQUARED 2
+#define ENEMY_MISSILE_ORIG_HEIGHT_FACTOR 5
+
 enum {
-    INIT_ST
-    MOVING_ST
-    EXPLODE_GROW_ST
-    EXPLODE_SHRINK_ST
-    IMPACT_ST
+    INIT_ST,
+    MOVING_ST,
+    EXPLODE_GROW_ST,
+    EXPLODE_SHRINK_ST,
+    IMPACT_ST,
     IDLE_ST
-}
+};
+
+
 
 /******************** Missile Init Functions ********************/
 
@@ -19,32 +25,194 @@ enum {
 
 // Initialize the missile as an idle missile. If initialized to the idle
 // state, a missile doesn't appear nor does it move.
-void missile_init_idle(missile_t *missile);
+void missile_init_idle(missile_t *missile) {
+    *missile = missile_t {
+    .currentState = IDLE_ST,
+    .explode_me = false,};
+}
 
 // Initialize the missile as a player missile. This function takes an (x, y)
 // destination of the missile (as specified by the user). The origin is the
 // closest "firing location" to the destination (there are three firing
 // locations evenly spaced along the bottom of the screen).
-void missile_init_player(missile_t *missile, coord_t x_dest, coord_t y_dest);
+void missile_init_player(missile_t *missile, coord_t x_dest, coord_t y_dest) {
+    coord_t x_orig;
+    coord_t y_orig;
+    get_closest_firing(x_dest, y_dest, &x_orig, &y_orig);
+
+    missile_init_idle(missile);
+    init_positioning(missile, x_dest, y_dest, x_orig, y_orig);
+
+    missile->type = MISSILE_TYPE_PLAYER;
+
+}
 
 // Initialize the missile as an enemy missile. This will randomly choose the
 // origin and destination of the missile. The origin is somewhere near the
 // top of the screen, and the destination is the very bottom of the screen.
-void missile_init_enemy(missile_t *missile);
+void missile_init_enemy(missile_t *missile) {
+    coord_t x_dest;
+    coord_t y_dest;
+    coord_t x_orig;
+    coord_t y_orig;
+    get_random_position(&x_dest, &y_dest, &x_orig, &y_orig);
+
+    missile_init_idle(missile);
+    init_positioning(missile, x_dest, y_dest, x_orig, y_orig);
+
+    missile->type = MISSILE_TYPE_ENEMY;
+
+}
 
 // Initialize the missile as a plane missile. This function takes the (x, y)
 // location of the plane as an argument and uses it as the missile origin.
 // The destination is randomly chosen along the bottom of the screen.
-void missile_init_plane(missile_t *missile, coord_t x_orig, coord_t y_orig);
+void missile_init_plane(missile_t *missile, coord_t x_orig, coord_t y_orig) {
+    coord_t x_dest;
+    coord_t y_dest;
+    coord_t x_temp;
+    coord_t y_temp;
+    get_random_position(&x_dest, &y_dest, &x_temp, &y_temp);
+
+    missile_init_idle(missile);
+    init_positioning(missile, x_dest, y_dest, x_orig, y_orig);
+
+    missile->type = MISSILE_TYPE_PLANE;
+
+}
 
 /******************** Missile Control & Tick Functions ********************/
 
 // Used to indicate that a moving missile should be detonated. This occurs
 // when an enemy or a plane missile is located within an explosion zone.
-void missile_explode(missile_t *missile);
+void missile_explode(missile_t *missile) {
+    missile->explode_me = true;
+}
+
+// Player Missile Tick
+void player_missile_tick(missile_t *missile) {
+    // State transitions
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+
+    // State actions
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+}
+
+// Enemy Missile Tick
+void enemy_missile_tick(missile_t *missile) {
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+
+    // State actions
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+}
+
+// Plane Missile Tick
+void plane_missile_tick(missile_t *missile) {
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+
+    // State actions
+    switch (missile->currentState) {
+        case INIT_ST:
+            break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            break;
+        case EXPLODE_GROW_ST:
+            break;
+        case EXPLODE_SHRINK_ST:
+            break;
+        case IMPACT_ST:
+            break;
+        default:
+    }
+}
 
 // Tick the state machine for a single missile.
-void missile_tick(missile_t *missile);
+void missile_tick(missile_t *missile) {
+    // Different Types
+    switch (missile->type) {
+        case MISSILE_TYPE_PLAYER:
+            player_missile_tick(missile);
+            break;
+        case MISSILE_TYPE_ENEMY:
+            enemy_missile_tick(missile);
+            break;
+        case MISSILE_TYPE_PLANE:
+            plane_missile_tick(missile);
+            break;
+    }
+}
 
 /******************** Missile Status Functions ********************/
 
@@ -60,24 +228,60 @@ missile_type_t missile_get_type(missile_t *missile) {
 }
 
 // Return whether the given missile is moving.
-bool missile_is_moving(missile_t *missile);
+bool missile_is_moving(missile_t *missile) {
+    return missile->currentState == MOVING_ST;
+}
 
 // Return whether the given missile is exploding. If this missile
 // is exploding, it can explode another intersecting missile.
 bool missile_is_exploding(missile_t *missile) {
-    return missile->state == EXPLODE_GROW_ST || missile->state == EXPLODE_SHRINK_ST
+    return missile->currentState == EXPLODE_GROW_ST || missile->currentState == EXPLODE_SHRINK_ST;
 }
 
 // Return whether the given missile is idle.
-bool missile_is_idle(missile_t *missile);
+bool missile_is_idle(missile_t *missile) {
+    return missile->currentState == IDLE_ST;
+}
 
 // Return whether the given missile is impacted.
 bool missile_is_impacted(missile_t *missile) {
-    return missile->y >= LCD_H;
+    return missile->y_current >= LCD_H;
 }
 
 // Return whether an object (e.g., missile or plane) at the specified
 // (x,y) position is colliding with the given missile. For a collision
 // to occur, the missile needs to be exploding and the specified
 // position needs to be within the explosion radius.
-bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y);
+bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y) {
+    bool is_colliding = false;
+    if (missile->explode_me) {
+        is_colliding = pow(missile->x_current - x, EXPONENT_SQUARED) + pow(missile->y_current - y, EXPONENT_SQUARED) < pow(missile->radius, EXPONENT_SQUARED);
+    }
+    return is_colliding;
+}
+
+// Find the closest firing station to any given missile destination
+void get_closest_firing(coord_t  x_dest, coord_t  y_dest, coord_t *x_orig, coord_t *y_orig) {
+
+}
+
+// Get random start point and end point for enemy missile
+void get_random_position(coord_t *x_dest, coord_t *y_dest, coord_t *x_orig, coord_t *y_orig) {
+    *x_dest = rand() % LCD_W;
+    *y_dest = LCD_H;
+
+    *x_orig = rand() % LCD_W;
+    *y_orig = rand() % (LCD_H / ENEMY_MISSILE_ORIG_HEIGHT_FACTOR);
+}
+
+// Initialize the position parameters in the given missile
+void init_positioning(missile_t *missile, coord_t x_dest, coord_t y_dest, coord_t x_orig, coord_t y_orig) {
+    missile->x_origin = x_orig;
+    missile->y_origin = y_orig;
+    missile->x_dest = x_dest;
+    missile->y_dest = y_dest;
+    missile->x_current = x_orig;
+    missile->y_current = y_orig;
+    missile->total_length = sqrt(pow(x_dest - x_orig, EXPONENT_SQUARED) + pow(y_dest - y_orig, EXPONENT_SQUARED));
+    missile->length = 0;
+}
