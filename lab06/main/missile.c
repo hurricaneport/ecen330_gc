@@ -204,11 +204,9 @@ void missile_tick(missile_t *missile) {
             break;
         case EXPLODE_GROW_ST:
             expand_explode(missile);
-            draw_missile_path(missile);
             break;
         case EXPLODE_SHRINK_ST:
             shrink_explode(missile);
-            draw_missile_path(missile);
             break;
         case IMPACT_ST:
             break;
