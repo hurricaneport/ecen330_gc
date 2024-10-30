@@ -2,11 +2,13 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "lcd.h"
 #include "missile.h"
+
+#include <config.h>
 
 #define EXPONENT_SQUARED 2
 #define ENEMY_MISSILE_ORIG_HEIGHT_FACTOR 5
+#define AMT_FIRE_LOCATIONS 3
 
 enum {
     INIT_ST,
@@ -16,8 +18,6 @@ enum {
     IMPACT_ST,
     IDLE_ST
 };
-
-
 
 /******************** Missile Init Functions ********************/
 
@@ -89,128 +89,126 @@ void missile_explode(missile_t *missile) {
     missile->explode_me = true;
 }
 
-// Player Missile Tick
-void player_missile_tick(missile_t *missile) {
-    // State transitions
-    switch (missile->currentState) {
-        case INIT_ST:
+// Used to move the given missile
+void move_missile(missile_t *missile) {
+    uint16_t missile_distance_per_tick;
+    switch (missile->type) { // Choose correct missile speed
+        case MISSILE_TYPE_PLAYER:
+            missile_distance_per_tick = CONFIG_PLAYER_MISSILE_DISTANCE_PER_TICK;
             break;
-        case IDLE_ST:
+        case MISSILE_TYPE_ENEMY:
+            missile_distance_per_tick = CONFIG_ENEMY_MISSILE_DISTANCE_PER_TICK;
             break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
-            break;
+        case MISSILE_TYPE_PLANE:
+            missile_distance_per_tick = CONFIG_ENEMY_MISSILE_DISTANCE_PER_TICK;
         default:
+            missile_distance_per_tick = 0;
+            break;
     }
 
-    // State actions
-    switch (missile->currentState) {
-        case INIT_ST:
+    missile->length += missile_distance_per_tick;
+    double fraction = missile->length / missile->total_length;
+
+    missile->x_current = missile->x_origin + fraction * (missile->x_dest - missile->x_origin);
+    missile->y_current = missile->y_origin + fraction * (missile->y_dest - missile->y_origin);
+}
+
+void get_missile_color(missile_t *missile, color_t *path_color) {
+    switch (missile->type) { // Choose correct path color
+        case MISSILE_TYPE_PLAYER:
+            *path_color = CONFIG_COLOR_PLAYER_MISSILE;
             break;
-        case IDLE_ST:
+        case MISSILE_TYPE_ENEMY:
+            *path_color = CONFIG_COLOR_ENEMY_MISSILE;
             break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
+        case MISSILE_TYPE_PLANE:
+            *path_color = CONFIG_COLOR_PLANE_MISSILE;
             break;
         default:
+            *path_color = BLACK;
+            break;
     }
 }
 
-// Enemy Missile Tick
-void enemy_missile_tick(missile_t *missile) {
-    switch (missile->currentState) {
-        case INIT_ST:
-            break;
-        case IDLE_ST:
-            break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
-            break;
-        default:
-    }
+// Used to draw the given missile
+void draw_missile_path(missile_t *missile) {
+    color_t path_color;
+    get_missile_color(missile, &path_color);
 
-    // State actions
-    switch (missile->currentState) {
-        case INIT_ST:
-            break;
-        case IDLE_ST:
-            break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
-            break;
-        default:
-    }
+    lcd_drawLine(missile->x_origin, missile->y_origin, missile->x_current, missile->y_current, path_color);
 }
 
-// Plane Missile Tick
-void plane_missile_tick(missile_t *missile) {
-    switch (missile->currentState) {
-        case INIT_ST:
-            break;
-        case IDLE_ST:
-            break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
-            break;
-        default:
-    }
+void expand_explode(missile_t *missile) {
+    missile->radius += CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
 
-    // State actions
-    switch (missile->currentState) {
-        case INIT_ST:
-            break;
-        case IDLE_ST:
-            break;
-        case MOVING_ST:
-            break;
-        case EXPLODE_GROW_ST:
-            break;
-        case EXPLODE_SHRINK_ST:
-            break;
-        case IMPACT_ST:
-            break;
-        default:
-    }
+    color_t explode_color;
+    get_missile_color(missile, &explode_color);
+    lcd_fillCircle(missile->x_current, missile->y_current, missile->radius, explode_color);
+}
+
+void shrink_explode(missile_t *missile) {
+    missile->radius -= CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
+
+    color_t explode_color;
+    get_missile_color(missile, &explode_color);
+    lcd_fillCircle(missile->x_current, missile->y_current, missile->radius + CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK, CONFIG_COLOR_BACKGROUND);
+    lcd_fillCircle(missile->x_current, missile->y_current, missile->radius, explode_color);
 }
 
 // Tick the state machine for a single missile.
 void missile_tick(missile_t *missile) {
-    // Different Types
-    switch (missile->type) {
-        case MISSILE_TYPE_PLAYER:
-            player_missile_tick(missile);
+    switch (missile->currentState) { // State transitions
+        case INIT_ST:
+            missile->currentState = MOVING_ST;
+        break;
+        case IDLE_ST:
             break;
-        case MISSILE_TYPE_ENEMY:
-            enemy_missile_tick(missile);
+        case MOVING_ST:
+            if (missile->explode_me) {
+                missile->currentState = EXPLODE_GROW_ST;
+            } else if (missile_is_impacted(missile)) {
+                missile->currentState = IMPACT_ST;
+            } else {
+                missile->currentState = MOVING_ST;
+            }
+        break;
+        case EXPLODE_GROW_ST:
+            if (missile->radius < CONFIG_EXPLOSION_MAX_RADIUS) {
+                missile->currentState = EXPLODE_GROW_ST;
+            } else {
+                missile->currentState = EXPLODE_SHRINK_ST;
+            }
+        break;
+        case EXPLODE_SHRINK_ST:
+            if (missile->radius > 0) {
+                missile->currentState = EXPLODE_SHRINK_ST;
+            } else {
+                missile->currentState = IDLE_ST;
+            }
+        break;
+        case IMPACT_ST:
             break;
-        case MISSILE_TYPE_PLANE:
-            plane_missile_tick(missile);
+        default:
+    }
+
+    switch (missile->currentState) { // State actions
+        case INIT_ST:
             break;
+        case IDLE_ST:
+            break;
+        case MOVING_ST:
+            move_missile(missile);
+            draw_missile_path(missile);
+            break;
+        case EXPLODE_GROW_ST:
+            expand_explode(missile);
+            break;
+        case EXPLODE_SHRINK_ST:
+            shrink_explode(missile);
+            break;
+        case IMPACT_ST:
+            break;
+        default:
     }
 }
 
@@ -262,7 +260,17 @@ bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y) {
 
 // Find the closest firing station to any given missile destination
 void get_closest_firing(coord_t  x_dest, coord_t  y_dest, coord_t *x_orig, coord_t *y_orig) {
+    coord_t x_temp = LCD_W / AMT_FIRE_LOCATIONS;
+    for (uint8_t i = 1; i < AMT_FIRE_LOCATIONS; i++) {
+        if (x_dest > i * LCD_W / AMT_FIRE_LOCATIONS) {
+            x_temp = i * LCD_W / (AMT_FIRE_LOCATIONS + 2);
+        } else {
+            break;
+        }
+    }
 
+    *x_orig = x_temp;
+    *y_orig = LCD_H;
 }
 
 // Get random start point and end point for enemy missile
@@ -284,4 +292,5 @@ void init_positioning(missile_t *missile, coord_t x_dest, coord_t y_dest, coord_
     missile->y_current = y_orig;
     missile->total_length = sqrt(pow(x_dest - x_orig, EXPONENT_SQUARED) + pow(y_dest - y_orig, EXPONENT_SQUARED));
     missile->length = 0;
+    missile->currentState = INIT_ST;
 }
