@@ -73,9 +73,22 @@ void gameControl_tick(void) {
 			missile_init_enemy(enemy_missiles+i);
 
 	// M1: Reinitialize idle player missiles, !!! remove after Milestone 1 !!!
-	for (uint32_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++)
-		if (missile_is_idle(player_missiles+i))
-			missile_init_player(player_missiles+i, rand()%LCD_W, rand()%LCD_H);
+	static bool button_flag = false;
+	coord_t cursor_x, cursor_y;
+	uint64_t btns= ~pin_get_in_reg() & HW_BTN_MASK;
+	if (!button_flag && btns) {
+		button_flag = true;
+		cursor_get_pos(&cursor_x, &cursor_y);
+		for (int i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
+			if (missile_is_idle(player_missiles+i)) {
+				missile_init_player(player_missiles+i, cursor_x, cursor_y);
+				break;
+			}
+		}
+	} else if (button_flag && !btns) {
+		button_flag = false;
+	}
+
 
 	// M2: Check for button press. If so, launch a free player missile.
 
