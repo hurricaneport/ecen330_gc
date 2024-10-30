@@ -5,6 +5,7 @@
 #include "missile.h"
 
 #include <config.h>
+#include <stdio.h>
 
 #define EXPONENT_SQUARED 2
 #define ENEMY_MISSILE_ORIG_HEIGHT_FACTOR 5
@@ -16,7 +17,7 @@ enum {
     EXPLODE_GROW_ST,
     EXPLODE_SHRINK_ST,
     IMPACT_ST,
-    IDLE_ST
+    IDLE_ST,
 };
 
 /******************** Missile Init Functions ********************/
@@ -26,9 +27,8 @@ enum {
 // Initialize the missile as an idle missile. If initialized to the idle
 // state, a missile doesn't appear nor does it move.
 void missile_init_idle(missile_t *missile) {
-    *missile = missile_t {
-    .currentState = IDLE_ST,
-    .explode_me = false,};
+    missile->currentState = IDLE_ST;
+    missile->explode_me = false;
 }
 
 // Initialize the missile as a player missile. This function takes an (x, y)
@@ -101,6 +101,7 @@ void move_missile(missile_t *missile) {
             break;
         case MISSILE_TYPE_PLANE:
             missile_distance_per_tick = CONFIG_ENEMY_MISSILE_DISTANCE_PER_TICK;
+            break;
         default:
             missile_distance_per_tick = 0;
             break;
@@ -187,6 +188,7 @@ void missile_tick(missile_t *missile) {
             }
         break;
         case IMPACT_ST:
+            missile->currentState = IDLE_ST;
             break;
         default:
     }
@@ -202,9 +204,11 @@ void missile_tick(missile_t *missile) {
             break;
         case EXPLODE_GROW_ST:
             expand_explode(missile);
+            draw_missile_path(missile);
             break;
         case EXPLODE_SHRINK_ST:
             shrink_explode(missile);
+            draw_missile_path(missile);
             break;
         case IMPACT_ST:
             break;
@@ -252,7 +256,8 @@ bool missile_is_impacted(missile_t *missile) {
 // position needs to be within the explosion radius.
 bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y) {
     bool is_colliding = false;
-    if (missile->explode_me) {
+    //printf("current state%ld\n", missile->currentState);
+    if (missile_is_exploding(missile)) {
         is_colliding = pow(missile->x_current - x, EXPONENT_SQUARED) + pow(missile->y_current - y, EXPONENT_SQUARED) < pow(missile->radius, EXPONENT_SQUARED);
     }
     return is_colliding;
@@ -260,10 +265,10 @@ bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y) {
 
 // Find the closest firing station to any given missile destination
 void get_closest_firing(coord_t  x_dest, coord_t  y_dest, coord_t *x_orig, coord_t *y_orig) {
-    coord_t x_temp = LCD_W / AMT_FIRE_LOCATIONS;
+    coord_t x_temp = LCD_W / (AMT_FIRE_LOCATIONS + 1);
     for (uint8_t i = 1; i < AMT_FIRE_LOCATIONS; i++) {
         if (x_dest > i * LCD_W / AMT_FIRE_LOCATIONS) {
-            x_temp = i * LCD_W / (AMT_FIRE_LOCATIONS + 2);
+            x_temp = (i + 1) * LCD_W / (AMT_FIRE_LOCATIONS + 1);
         } else {
             break;
         }

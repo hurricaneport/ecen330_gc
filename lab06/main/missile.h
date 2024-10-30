@@ -112,8 +112,7 @@ bool missile_is_impacted(missile_t *missile);
 bool missile_is_colliding(missile_t *missile, coord_t x, coord_t y);
 
 // Get random start point and end point for enemy missile
-void get_random_position(coord_t *x_dest, coord_t *y_dest, coord_t *x_orig, coord_t *y_orig)
-
+void get_random_position(coord_t *x_dest, coord_t *y_dest, coord_t *x_orig, coord_t *y_orig);
 // Find the closest firing station to any given missile destination
 void get_closest_firing(coord_t  x_dest, coord_t  y_dest, coord_t *x_orig, coord_t *y_orig);
 

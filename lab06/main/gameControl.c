@@ -51,11 +51,21 @@ void gameControl_init(void)
 // This function calls the missile & plane tick functions, reinitializes
 // idle enemy missiles, handles button presses, fires player missiles,
 // detects collisions, and updates statistics.
-void gameControl_tick(void)
-{
-	// Tick missiles in one batch
-	for (uint32_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++)
+void gameControl_tick(void) {
+	// Tick missiles in one batch and check if exploded by other missiles
+	for (uint32_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
 		missile_tick(missiles+i);
+		if ((missiles+i)->type == MISSILE_TYPE_PLAYER && (missiles+i)->length >= (missiles+i)->total_length) {
+			missile_explode(missiles+i);
+		} else if (missile_get_type((missiles+i)) != MISSILE_TYPE_PLAYER) {
+			for (uint32_t k = 0; k < CONFIG_MAX_TOTAL_MISSILES; k++) {
+				if(missile_is_colliding(missiles+k, (missiles+i)->x_current, (missiles+i)->y_current)) {
+					missile_explode(missiles+i);
+					break;
+				}
+			}
+		}
+	}
 
 	// Reinitialize idle enemy missiles
 	for (uint32_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++)
