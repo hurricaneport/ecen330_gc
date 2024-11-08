@@ -13,7 +13,7 @@
 #include "gameControl.h"
 #include "config.h"
 
-// sound support
+// sound support testing
 #include "missileLaunch.h"
 
 // The update period as an integer in ms
