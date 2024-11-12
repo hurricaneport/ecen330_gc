@@ -3,6 +3,8 @@ build
 sdkconfig
 *.o
 a.out
+*cmake-build-debug*
+*.idea*
 
 # Zip files
 *.zip
