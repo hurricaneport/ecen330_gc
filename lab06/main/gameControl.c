@@ -89,12 +89,13 @@ void gameControl_tick(void) {
 		button_flag = false;
 	}
 
-
-	// M2: Check for button press. If so, launch a free player missile.
-
-	// M2: Check for moving non-player missile collision with an explosion.
-
 	// M3: Count non-player impacted missiles
+	static uint16_t impacted = 0;
+	for (int i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
+		if(missile_is_impacted(enemy_missiles + i)) {
+			impacted += 1;
+		}
+	}
 
 	// M3: Tick plane & draw stats
 
