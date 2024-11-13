@@ -114,6 +114,7 @@ void move_missile(missile_t *missile) {
     missile->y_current = missile->y_origin + fraction * (missile->y_dest - missile->y_origin);
 }
 
+//Figure out proper missile color
 void get_missile_color(missile_t *missile, color_t *path_color) {
     switch (missile->type) { // Choose correct path color
         case MISSILE_TYPE_PLAYER:
@@ -139,6 +140,7 @@ void draw_missile_path(missile_t *missile) {
     lcd_drawLine(missile->x_origin, missile->y_origin, missile->x_current, missile->y_current, path_color);
 }
 
+//Draw expanding explosion
 void expand_explode(missile_t *missile) {
     missile->radius += CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
 
@@ -147,6 +149,7 @@ void expand_explode(missile_t *missile) {
     lcd_fillCircle(missile->x_current, missile->y_current, missile->radius, explode_color);
 }
 
+//Draw shrinking explosion
 void shrink_explode(missile_t *missile) {
     missile->radius -= CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
 
