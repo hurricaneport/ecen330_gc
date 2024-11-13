@@ -97,7 +97,7 @@ void gameControl_tick(void) {
 	if (!button_flag && btns) { // Button has been pressed and not yet activated
 		button_flag = true;
 		cursor_get_pos(&cursor_x, &cursor_y);
-		for (int i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) { // Check for idle missile
+		for (int32_t i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) { // Check for idle missile
 			if (missile_is_idle(player_missiles+i)) { // if idle, fire then break
 				missiles_fired++;
 				missile_init_player(player_missiles+i, cursor_x, cursor_y);
@@ -109,8 +109,8 @@ void gameControl_tick(void) {
 		button_flag = false;
 	}
 
-	for (int i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
-		if(missile_is_impacted(missiles + i)) {
+	for (int32_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
+		if (missile_is_impacted(missiles + i)) {
 			missiles_impacted += 1;
 		}
 	}
