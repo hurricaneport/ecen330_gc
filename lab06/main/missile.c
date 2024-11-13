@@ -245,7 +245,7 @@ bool missile_is_idle(missile_t *missile) {
 
 // Return whether the given missile is impacted.
 bool missile_is_impacted(missile_t *missile) {
-    return missile->y_current >= LCD_H;
+    return missile->y_current >= LCD_H && missile->type != MISSILE_TYPE_PLAYER;
 }
 
 // Return whether an object (e.g., missile or plane) at the specified

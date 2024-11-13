@@ -41,7 +41,7 @@ void gameControl_init(void)
 	missile_init_idle(plane_missile);
 
 	// M3: Initialize plane
-
+	plane_init(plane_missile);
 	// M3: Initialize stats
 
 	// M3: Set sound volume
@@ -68,11 +68,16 @@ void gameControl_tick(void) {
 	}
 
 	// Reinitialize idle enemy missiles
-	for (uint32_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++)
-		if (missile_is_idle(enemy_missiles+i))
+	for (uint32_t i = 0; i < CONFIG_MAX_ENEMY_MISSILES; i++) {
+		if (missile_is_idle(enemy_missiles+i)) {
 			missile_init_enemy(enemy_missiles+i);
+		}
+	}
 
-	// M1: Reinitialize idle player missiles, !!! remove after Milestone 1 !!!
+	//Fire Missiles when pressed
+
+	static uint16_t missiles_fired = 0;
+
 	static bool button_flag = false;
 	coord_t cursor_x, cursor_y;
 	uint64_t btns= ~pin_get_in_reg() & HW_BTN_MASK;
@@ -81,6 +86,7 @@ void gameControl_tick(void) {
 		cursor_get_pos(&cursor_x, &cursor_y);
 		for (int i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
 			if (missile_is_idle(player_missiles+i)) {
+				missiles_fired++;
 				missile_init_player(player_missiles+i, cursor_x, cursor_y);
 				break;
 			}
@@ -90,14 +96,35 @@ void gameControl_tick(void) {
 	}
 
 	// M3: Count non-player impacted missiles
-	static uint16_t impacted = 0;
+	static uint16_t missiles_impacted = 0;
 	for (int i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
-		if(missile_is_impacted(enemy_missiles + i)) {
-			impacted += 1;
+		if(missile_is_impacted(missiles + i)) {
+			missiles_impacted += 1;
 		}
 	}
 
-	// M3: Tick plane & draw stats
+	//Tick plane
+	static uint32_t cnt = 0;
 
-	// M3: Check for flying plane collision with an explosion.
+	plane_tick();
+	if (!plane_is_flying()) {
+		cnt += 1;
+	}
+	if (cnt > CONFIG_PLANE_IDLE_TIME_TICKS) {
+		plane_init(plane_missile);
+		cnt = 0;
+	}
+
+	//check for explosion
+	coord_t plane_x, plane_y;
+	plane_get_pos(&plane_x, &plane_y);
+	for (int i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) {
+		if (missile_is_colliding(missiles + i, plane_x, plane_y)) {
+			plane_explode();
+		}
+	}
+
+	//Draw Stats
+
+
 }
