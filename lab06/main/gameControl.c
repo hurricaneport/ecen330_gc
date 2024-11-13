@@ -133,7 +133,6 @@ void gameControl_tick(void) {
 	for (uint32_t i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) { // Cycle through all missiles to check
 		if (missile_is_colliding(missiles + i, plane_x, plane_y)) {
 			plane_explode();
-			printf("missile exploded\n");
 			break;
 		}
 	}
