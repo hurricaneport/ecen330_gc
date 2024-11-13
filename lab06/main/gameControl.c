@@ -35,8 +35,8 @@ missile_t *plane_missile = missiles+CONFIG_MAX_ENEMY_MISSILES+
 									CONFIG_MAX_PLAYER_MISSILES;
 
 // M3: Declare stats variables
-uint16_t missiles_fired = 0;
-uint16_t missiles_impacted = 0;
+uint32_t missiles_fired = 0;
+uint32_t missiles_impacted = 0;
 
 
 // Initialize the game control logic.
@@ -101,14 +101,13 @@ void gameControl_tick(void) {
 			if (missile_is_idle(player_missiles+i)) { // if idle, fire then break
 				missiles_fired++;
 				missile_init_player(player_missiles+i, cursor_x, cursor_y);
+				sound_start(missileLaunch, MISSILELAUNCH_SAMPLES, false);
 				break;
 			}
 		}
 	} else if (button_flag && !btns) {
 		button_flag = false;
 	}
-
-	// M3: Count non-player impacted missiles
 
 	for (int i = 0; i < CONFIG_MAX_TOTAL_MISSILES; i++) {
 		if(missile_is_impacted(missiles + i)) {
@@ -134,6 +133,8 @@ void gameControl_tick(void) {
 	for (int i = 0; i < CONFIG_MAX_PLAYER_MISSILES; i++) { // Cycle through all missiles to check
 		if (missile_is_colliding(missiles + i, plane_x, plane_y)) {
 			plane_explode();
+			printf("missile exploded\n");
+			break;
 		}
 	}
 
@@ -141,8 +142,8 @@ void gameControl_tick(void) {
 	char shot_string[SHOT_STRING_SIZE];
 	char impacted_string[IMPACTED_STRING_SIZE];
 
-	sprintf(shot_string, "Shot: %2d", missiles_fired);
-	sprintf(impacted_string, "Impacted: %2d", missiles_impacted);
+	sprintf(shot_string, "Shot: %ld", missiles_fired);
+	sprintf(impacted_string, "Impacted: %ld", missiles_impacted);
 
 	lcd_drawString(SHOT_X, SHOT_Y, shot_string, CONFIG_COLOR_STATUS);
 	lcd_drawString(IMPACTED_X, IMPACTED_Y, impacted_string, CONFIG_COLOR_STATUS);

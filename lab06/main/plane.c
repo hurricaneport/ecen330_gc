@@ -55,7 +55,7 @@ void plane_tick(void) {
     switch (plane_curr_state) { // State Transition Logic
         case INIT_ST:
             plane_curr_state = MOVING_ST;
-            printf("Missile Starting\n");
+            //printf("Missile Starting\n");
             break;
         case MOVING_ST:
             if (plane_explode_me) {
@@ -64,17 +64,21 @@ void plane_tick(void) {
                 plane_curr_state = FIRE_ST;
             } else if (plane_curr_x < -CONFIG_PLANE_WIDTH) {
                 plane_curr_state = IDLE_ST;
-                printf("Missile Done\n");
+                //printf("Missile Done\n");
             } else {
                 plane_curr_state = MOVING_ST;
             }
             break;
         case FIRE_ST:
-            plane_curr_state = MOVING_ST;
+            if (plane_explode_me) {
+                plane_curr_state = EXPLODE_ST;
+            } else {
+                plane_curr_state = MOVING_ST;
+            }
             break;
         case EXPLODE_ST:
             plane_curr_state = IDLE_ST;
-            printf("Missile Done\n");
+            //printf("Missile Done\n");
             break;
         case IDLE_ST:
             plane_curr_state = IDLE_ST;
