@@ -140,6 +140,10 @@ void draw_missile_path(missile_t *missile) {
     lcd_drawLine(missile->x_origin, missile->y_origin, missile->x_current, missile->y_current, path_color);
 }
 
+bool missile_impact(missile_t *missile) {
+    return missile->type != MISSILE_TYPE_PLAYER && missile->y_current <= LCD_H;
+}
+
 //Draw expanding explosion
 void expand_explode(missile_t *missile) {
     missile->radius += CONFIG_EXPLOSION_RADIUS_CHANGE_PER_TICK;
@@ -170,7 +174,7 @@ void missile_tick(missile_t *missile) {
         case MOVING_ST:
             if (missile->explode_me) {
                 missile->currentState = EXPLODE_GROW_ST;
-            } else if (missile_is_impacted(missile)) {
+            } else if (missile_impacted(missile)) {
                 missile->currentState = IMPACT_ST;
             } else {
                 missile->currentState = MOVING_ST;
