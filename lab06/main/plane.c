@@ -118,7 +118,7 @@ bool plane_is_flying(void) {
 
 //Draw plane at current location
 void draw_plane(void) {
-    lcd_drawTriangle(plane_curr_x + CONFIG_PLANE_WIDTH, plane_curr_y - CONFIG_PLANE_HEIGHT / 2,
+    lcd_fillTriangle(plane_curr_x + CONFIG_PLANE_WIDTH, plane_curr_y - CONFIG_PLANE_HEIGHT / 2,
         plane_curr_x + CONFIG_PLANE_WIDTH,plane_curr_y + CONFIG_PLANE_HEIGHT / 2,
         plane_curr_x, plane_curr_y,
         CONFIG_COLOR_PLANE);
