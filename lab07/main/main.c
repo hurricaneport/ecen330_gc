@@ -1,5 +1,4 @@
 #include <esp_timer.h>
-#include <lcd.h>
 #include <stdio.h>
 
 #include "freertos/FreeRTOS.h"
@@ -7,6 +6,8 @@
 #include "esp_log.h"
 #include "pin.h"
 #include "config.h"
+#include "gameControl.h"
+#include "lcd.h"
 
 #define JUMP_PIN HW_BTN_A
 #define RESET_PIN HW_BTN_START
@@ -44,6 +45,7 @@ void app_main(void)
 	// Init
 	lcd_init();
 	lcd_frameEnable();
+	gameControl_init();
 	lcd_fillScreen(CONFIG_COLOR_BACKGROUND);
 
 	// IO Setup
@@ -83,7 +85,10 @@ void app_main(void)
 		t1 = esp_timer_get_time();
 		interrupt_flag = false;
 
-		//CODE LOOP HERE
+		// Erase Screen
+		lcd_fillScreen(CONFIG_COLOR_BACKGROUND);
+
+		gameControl_tick();
 
 		lcd_writeFrame();
 
