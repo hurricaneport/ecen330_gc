@@ -92,4 +92,7 @@ void app_main(void)
 		t2 = esp_timer_get_time();
 		if (t2 - t1 > t_max) t_max = t2 - t1;
 	}
+
+	printf("Handled %lu of %lu interrupts\n", isr_handled_count, isr_triggered_count);
+	printf("WCET us:%llu\n", t_max);
 }
