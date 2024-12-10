@@ -39,4 +39,7 @@ void get_bird_location(bird_type_t bird, coord_t *y);
 
 //Get if bird is dead
 bool bird_is_dead(bird_type_t bird);
+
+//Check when bird becomes idle
+bool bird_is_idle(bird_type_t bird);
 #endif //BIRD_H

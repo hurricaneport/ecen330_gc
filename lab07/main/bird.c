@@ -155,3 +155,9 @@ bool bird_is_dead(bird_type_t bird)
 {
     return (bird.current_state == DEATH_FALL_ST || bird.current_state == DEATH_IDLE_ST);
 }
+
+//Check when bird becomes idle
+bool bird_is_idle(bird_type_t bird)
+{
+    return bird.current_state == DEATH_IDLE_ST;
+}
