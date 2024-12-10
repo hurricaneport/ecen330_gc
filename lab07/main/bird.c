@@ -14,11 +14,11 @@ enum
     DEATH_IDLE_ST,
 };
 
+coord_t current_x = CONFIG_BIRD_X_LOCATION;
 //Initialize bird logic before game
 void bird_init(bird_type_t *bird)
 {
     bird->current_state = INIT_ST;
-    bird->current_x = CONFIG_BIRD_X_LOCATION;
     bird->current_y = CONFIG_BIRD_Y_START_LOCATION;
     bird->current_velocity = 0;
     bird->hit_me = false;
@@ -129,7 +129,7 @@ void tick_bird(bird_type_t *bird)
 void draw_bird(bird_type_t bird)
 {
     const color_t bird_color = (bird.current_state == DEATH_FALL_ST || bird.current_state == DEATH_IDLE_ST) ? CONFIG_COLOR_BIRD_DEATH : CONFIG_COLOR_BIRD;
-    lcd_fillCircle(bird.current_x, (coord_t) bird.current_y, (coord_t) CONFIG_BIRD_H / 2, bird_color);
+    lcd_fillCircle(current_x, (coord_t) bird.current_y, (coord_t) CONFIG_BIRD_H / 2, bird_color);
 }
 
 //Indicate bird should die
@@ -145,9 +145,8 @@ void jump_bird(bird_type_t *bird)
 }
 
 //Get bird's current location
-void get_bird_location(bird_type_t bird, coord_t *x, coord_t *y)
+void get_bird_location(bird_type_t bird, coord_t *y)
 {
-    *x = bird.current_x;
     *y = (coord_t) bird.current_y;
 }
 

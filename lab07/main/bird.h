@@ -11,7 +11,6 @@
 typedef struct
 {
     int32_t current_state;
-    coord_t current_x;
     float current_y;
 
     float current_velocity;
@@ -36,7 +35,7 @@ void kill_bird(bird_type_t *bird);
 void jump_bird(bird_type_t *bird);
 
 //Get bird's current location
-void get_bird_location(bird_type_t bird, coord_t *x, coord_t *y);
+void get_bird_location(bird_type_t bird, coord_t *y);
 
 //Get if bird is dead
 bool bird_is_dead(bird_type_t bird);
