@@ -2,7 +2,6 @@
 // Created by dansi on 12/9/2024.
 //
 
-
 #include "bird.h"
 #include "config.h"
 
@@ -123,7 +122,6 @@ void tick_bird(bird_type_t *bird)
             break;
         default:
             break;
-
     }
 }
 
