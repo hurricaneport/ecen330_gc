@@ -3,21 +3,30 @@
 //
 
 #include "gameControl.h"
+
+#include <config.h>
+#include <pipe.h>
+
 #include "bird.h"
 #include "pin.h"
 
 bird_type_t bird;
+pipe_type_t pipes[CONFIG_PIPE_MAX_PIPES];
 // Initialize game logic
 void gameControl_init(void)
 {
     bird_init(&bird);
+    for (int i = 0; i < CONFIG_PIPE_MAX_PIPES; i++)
+    {
+        pipe_init(&pipes[i]);
+    }
 }
 
 // Tick the game control function. This ticks each individual state machine.
 void gameControl_tick(void)
 {
     static bool game_over = false;
-    if (!game_over)
+    if (!bird_is_idle(bird))
     {
         static bool jump_flag = false;
         if (!pin_get_level(HW_BTN_A) && !jump_flag)
@@ -28,14 +37,14 @@ void gameControl_tick(void)
         {
             jump_flag = false;
         }
+
         tick_bird(&bird);
         draw_bird(bird);
+
+        for (int i = 0; i < CONFIG_PIPE_MAX_PIPES; i++)
+
         game_over = bird_is_dead(bird);
 
-    } else
-    {
-        tick_bird(&bird);
-        draw_bird(bird);
     }
 }
 
