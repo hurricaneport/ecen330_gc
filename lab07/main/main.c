@@ -1,4 +1,5 @@
 #include <esp_timer.h>
+#include <sound.h>
 #include <stdio.h>
 
 #include "freertos/FreeRTOS.h"
@@ -49,6 +50,7 @@ void app_main(void)
 	lcd_frameEnable();
 	gameControl_init();
 	lcd_fillScreen(CONFIG_COLOR_BACKGROUND);
+	sound_init(CONFIG_AUDIO_SAMPLE);
 
 	// IO Setup
 	pin_reset(JUMP_PIN);
@@ -102,4 +104,6 @@ void app_main(void)
 
 	printf("Handled %lu of %lu interrupts\n", isr_handled_count, isr_triggered_count);
 	printf("WCET us:%llu\n", t_max / MS);
+
+	sound_deinit();
 }

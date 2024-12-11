@@ -6,10 +6,13 @@
 
 #include <config.h>
 #include <pipe.h>
+#include <sfx_hit.h>
+#include <sound.h>
 #include <stdio.h>
 
 #include "bird.h"
 #include "pin.h"
+#include "sfx_point.h"
 
 bird_type_t bird;
 pipe_type_t pipes[CONFIG_PIPE_MAX_PIPES];
@@ -59,6 +62,7 @@ void gameControl_tick(void)
         //Check if pipe has scored since last tick and add it to total score
         if (pipe_scored(pipes[i]) && !pipes_scored[i])
         {
+            sound_start(sfx_point, sizeof(sfx_hit), false);
             pipes_scored[i] = true;
             current_score++;
         }
@@ -66,7 +70,6 @@ void gameControl_tick(void)
         //Check if pipe has progressed far enough for new pipe to spawn since last tick
         if (get_pipe_position(pipes[i]) < LCD_W - CONFIG_PIPE_HORIZ_SPACING && !pipes_progressed[i] && !pipe_is_idle(pipes[i]))
         {
-            printf("drawing new pipe\n");
             pipes_progressed[i] = true;
             for (int j = 0; j < CONFIG_PIPE_MAX_PIPES; j++)
             {

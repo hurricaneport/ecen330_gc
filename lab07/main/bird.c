@@ -3,7 +3,12 @@
 //
 
 #include "bird.h"
+
+#include <sound.h>
+
 #include "config.h"
+#include "sfx_wing.h"
+#include "sfx_hit.h"
 
 enum
 {
@@ -36,10 +41,15 @@ void tick_bird(bird_type_t *bird)
         case FLYING_ST:
             if (bird->hit_me)
             {
+                sound_start(sfx_hit, sizeof(sfx_hit), false);
                 bird->current_state = DEATH_FALL_ST;
                 bird->hit_me = false;
             } else if (bird->jump_me)
             {
+                if (!sound_busy())
+                {
+                    sound_start(sfx_wing, sizeof(sfx_wing), false);
+                }
                 bird->current_state = JUMP_ST;
                 bird->jump_me = false;
             } else
@@ -50,6 +60,7 @@ void tick_bird(bird_type_t *bird)
         case JUMP_ST:
             if (bird->hit_me)
             {
+                sound_start(sfx_hit, sizeof(sfx_hit), false);
                 bird->current_state = DEATH_FALL_ST;
                 bird->hit_me = false;
             } else
