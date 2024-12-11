@@ -145,9 +145,8 @@ void jump_bird(bird_type_t *bird)
 }
 
 //Get bird's current location
-void get_bird_location(bird_type_t bird, coord_t *y)
-{
-    *y = (coord_t) bird.current_y;
+coord_t get_bird_location(bird_type_t bird) {
+    return (coord_t) bird.current_y;
 }
 
 //Get if bird is dead

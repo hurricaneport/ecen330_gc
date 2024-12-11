@@ -35,7 +35,7 @@ void kill_bird(bird_type_t *bird);
 void jump_bird(bird_type_t *bird);
 
 //Get bird's current location
-void get_bird_location(bird_type_t bird, coord_t *y);
+coord_t get_bird_location(bird_type_t bird);
 
 //Get if bird is dead
 bool bird_is_dead(bird_type_t bird);

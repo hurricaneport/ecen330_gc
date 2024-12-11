@@ -16,6 +16,8 @@
 #define TIME_OUT 500
 #define PER_MS ((uint32_t)(CONFIG_GAME_TIMER_PERIOD*1000))
 
+#define MS 1000
+
 static const char *TAG = "lab07";
 
 TimerHandle_t update_timer;
@@ -99,5 +101,5 @@ void app_main(void)
 	}
 
 	printf("Handled %lu of %lu interrupts\n", isr_handled_count, isr_triggered_count);
-	printf("WCET us:%llu\n", t_max);
+	printf("WCET us:%llu\n", t_max / MS);
 }
